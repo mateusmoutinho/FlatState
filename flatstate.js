@@ -33,6 +33,38 @@ class FlatState{
         // Set the final value
         current[path[path.length - 1]] = value;
     }
+    get(path) {
+        if (!Array.isArray(path)) {
+            throw new Error('Path must be an array');
+        }
+        
+        let current = this.mainObject;
+        
+        for (let key of path) {
+            if (current === undefined || current === null) {
+                return undefined;
+            }
+            
+            // Handle negative indices for arrays
+            if (Array.isArray(current) && typeof key === 'number' && key < 0) {
+                key = current.length + key;
+                // If the calculated index is still negative, return undefined
+                if (key < 0) {
+                    return undefined;
+                }
+            }
+            
+            current = current[key];
+        }
+        
+        return current;
+    }
+
+    getState() {
+        return this.mainObject;
+    }
+
+    
 
     createValueSetterHandler(path){
         return (newValue) => {
@@ -135,36 +167,6 @@ class FlatState{
         }
     }
 
-    get(path) {
-        if (!Array.isArray(path)) {
-            throw new Error('Path must be an array');
-        }
-        
-        let current = this.mainObject;
-        
-        for (let key of path) {
-            if (current === undefined || current === null) {
-                return undefined;
-            }
-            
-            // Handle negative indices for arrays
-            if (Array.isArray(current) && typeof key === 'number' && key < 0) {
-                key = current.length + key;
-                // If the calculated index is still negative, return undefined
-                if (key < 0) {
-                    return undefined;
-                }
-            }
-            
-            current = current[key];
-        }
-        
-        return current;
-    }
-
-    getState() {
-        return this.mainObject;
-    }
 
 }
 if (typeof module !== 'undefined' && module.exports) {
