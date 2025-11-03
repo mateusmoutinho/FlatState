@@ -45,6 +45,16 @@ class FlatState{
             if (current === undefined || current === null) {
                 return undefined;
             }
+            
+            // Handle negative indices for arrays
+            if (Array.isArray(current) && typeof key === 'number' && key < 0) {
+                key = current.length + key;
+                // If the calculated index is still negative, return undefined
+                if (key < 0) {
+                    return undefined;
+                }
+            }
+            
             current = current[key];
         }
         
