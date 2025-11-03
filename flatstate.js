@@ -2,6 +2,9 @@
 
 class FlatState{
     constructor(mainObject = {}){
+        if(typeof mainObject !== 'object' || mainObject === null){
+            throw new Error('Main object must be a non-null object');
+        }
         this.mainObject = mainObject;
     }
     setSetterCallback(callback){
@@ -88,8 +91,18 @@ class FlatState{
         
         return current;
     }
+    subState(path){
+        const subObject = this.get(path);
+        if(typeof subObject !== 'object' || subObject === null){
+            throw new Error('Substate target must be a non-null object');
+        }
+        const subStateInstance = new FlatState(subObject); 
+        if(this.setterCallback){
+            subStateInstance.setterCallback = this.setterCallback;
+        }
+        return subStateInstance;
+    }
 
-    
     getState() {
         return this.mainObject;
     }
@@ -162,7 +175,7 @@ class FlatState{
         // Clamp index to valid range
         actualIndex = Math.max(0, Math.min(actualIndex, arr.length));
         arr.splice(actualIndex, 0, value);
-        
+
     }
 
     pop(path){
