@@ -34,6 +34,18 @@ class FlatState{
         current[path[path.length - 1]] = value;
     }
 
+    createValueSetterHandler(path){
+        return (newValue) => {
+            this.set(path, newValue);
+        }
+    }
+    createEventTargetPathHandler(path){
+        return (event) => {
+            console.log('Event target value:', event.target.value);
+            this.set(path, event.target.value);
+        }
+    }
+
     get(path) {
         if (!Array.isArray(path)) {
             throw new Error('Path must be an array');
@@ -66,5 +78,6 @@ class FlatState{
     }
 
 }
-
-module.exports = FlatState;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = FlatState;
+} 
