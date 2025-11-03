@@ -149,6 +149,34 @@ class FlatState{
         // Remove the element at the specified index
         current.splice(actualIndex, 1);
     }
+    insert(path, index, value){
+        const arr = this.get(path);
+        if(!Array.isArray(arr)){
+            throw new Error('Target at path is not an array');
+        }
+        // Handle negative indices
+        let actualIndex = index;
+        if (index < 0) {
+            actualIndex = arr.length + index;
+        }
+        // Clamp index to valid range
+        actualIndex = Math.max(0, Math.min(actualIndex, arr.length));
+        arr.splice(actualIndex, 0, value);
+        
+    }
+
+    pop(path){
+        const arr = this.get(path);
+        if(Array.isArray(arr)){
+            return arr.pop();
+        }
+        return undefined;
+    }
+    createArrayPopHandler(path){
+        return () => {
+            this.pop(path);
+        }
+    }
 
     createValueSetterHandler(path){
         return (newValue) => {
