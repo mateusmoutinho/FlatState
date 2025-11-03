@@ -89,6 +89,7 @@ class FlatState{
         return current;
     }
 
+    
     getState() {
         return this.mainObject;
     }
@@ -117,6 +118,36 @@ class FlatState{
         }
         
         current.push(value);
+    }
+
+    destroy(path, index) {
+        if (!Array.isArray(path) || path.length === 0) {
+            throw new Error('Path must be a non-empty array');
+        }
+        
+        let current = this.get(path);
+        
+        if (current === undefined || current === null) {
+            throw new Error('Target at path does not exist');
+        }
+        
+        if (!Array.isArray(current)) {
+            throw new Error('Target at path is not an array');
+        }
+        
+        // Handle negative indices
+        let actualIndex = index;
+        if (index < 0) {
+            actualIndex = current.length + index;
+        }
+        
+        // Check if index is valid
+        if (actualIndex < 0 || actualIndex >= current.length) {
+            throw new Error(`Index ${index} is out of bounds for array of length ${current.length}`);
+        }
+        
+        // Remove the element at the specified index
+        current.splice(actualIndex, 1);
     }
 
     createValueSetterHandler(path){
@@ -167,6 +198,12 @@ class FlatState{
             if (Array.isArray(array) && index >= 0 && index < array.length) {
                 array.splice(index, 1);
             }
+        }
+    }
+
+    createArrayDestroyHandler(path, index){
+        return () => {
+            this.destroy(path, index);
         }
     }
 
