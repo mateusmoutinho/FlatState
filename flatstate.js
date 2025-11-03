@@ -87,20 +87,20 @@ class FlatState{
         }
     }
 
-    createCheckboxHandler(path){
+    createCheckboxEventHandler(path){
         return (event) => {
             this.set(path, event.target.checked,{event:event});
         }
     }
 
-    createNumberHandler(path){
+    createNumberEventHandler(path){
         return (event) => {
             const value = parseFloat(event.target.value);
             this.set(path, isNaN(value) ? 0 : value,{event:event});
         }
     }
 
-    createIntegerHandler(path){
+    createIntegerEventHandler(path){
         return (event) => {
             const value = parseInt(event.target.value, 10);
             this.set(path, isNaN(value) ? 0 : value,{event:event});
@@ -148,7 +148,7 @@ class FlatState{
         }
     }
 
-    createSelectHandler(path){
+    createSelectEventHandler(path){
         return (event) => {
             const selectedOptions = Array.from(event.target.selectedOptions);
             if (event.target.multiple) {
@@ -159,7 +159,7 @@ class FlatState{
         }
     }
 
-    createFormHandler(pathMap){
+    createFormEventHandler(pathMap){
         return (event) => {
             event.preventDefault();
             const formData = new FormData(event.target);
