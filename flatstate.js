@@ -83,7 +83,6 @@ class FlatState{
     }
     createEventTargetPathHandler(path){
         return (event) => {
-            console.log('Event target value:', event.target.value);
             this.set(path, event.target.value,{event:event});
         }
     }
