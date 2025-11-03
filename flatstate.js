@@ -4,7 +4,10 @@ class FlatState{
     constructor(mainObject = {}){
         this.mainObject = mainObject;
     }
-    set(path, value){
+    setSetterCallback(callback){
+        this.setterCallback = callback;
+    }
+    set(path, value,props){
         if (!Array.isArray(path) || path.length === 0) {
             throw new Error('Path must be a non-empty array');
         }
@@ -32,6 +35,13 @@ class FlatState{
         
         // Set the final value
         current[path[path.length - 1]] = value;
+        if(this.setterCallback){
+            let all_props = {path:path,value:value};
+            if(props){
+            Object.assign(all_props,props);
+            }
+            this.setterCallback(all_props);
+        }
     }
     get(path) {
         if (!Array.isArray(path)) {
@@ -64,7 +74,7 @@ class FlatState{
         return this.mainObject;
     }
 
-    
+
 
     createValueSetterHandler(path){
         return (newValue) => {
@@ -74,27 +84,27 @@ class FlatState{
     createEventTargetPathHandler(path){
         return (event) => {
             console.log('Event target value:', event.target.value);
-            this.set(path, event.target.value);
+            this.set(path, event.target.value,{event:event});
         }
     }
 
     createCheckboxHandler(path){
         return (event) => {
-            this.set(path, event.target.checked);
+            this.set(path, event.target.checked,{event:event});
         }
     }
 
     createNumberHandler(path){
         return (event) => {
             const value = parseFloat(event.target.value);
-            this.set(path, isNaN(value) ? 0 : value);
+            this.set(path, isNaN(value) ? 0 : value,{event:event});
         }
     }
 
     createIntegerHandler(path){
         return (event) => {
             const value = parseInt(event.target.value, 10);
-            this.set(path, isNaN(value) ? 0 : value);
+            this.set(path, isNaN(value) ? 0 : value,{event:event});
         }
     }
 
@@ -143,9 +153,9 @@ class FlatState{
         return (event) => {
             const selectedOptions = Array.from(event.target.selectedOptions);
             if (event.target.multiple) {
-                this.set(path, selectedOptions.map(option => option.value));
+                this.set(path, selectedOptions.map(option => option.value),{event:event});
             } else {
-                this.set(path, event.target.value);
+                this.set(path, event.target.value,{event:event});
             }
         }
     }
