@@ -19,6 +19,15 @@ class FlatState{
             let key = path[i];
             let nextKey = path[i + 1];
             
+            // Handle negative indices for arrays
+            if (Array.isArray(current) && typeof key === 'number' && key < 0) {
+                key = current.length + key;
+                // If the calculated index is still negative, throw an error
+                if (key < 0) {
+                    throw new Error(`Negative index ${path[i]} is out of bounds for array of length ${current.length}`);
+                }
+            }
+            
             // If current[key] doesn't exist, create it
             if (current[key] === undefined || current[key] === null) {
                 // If next key is a number, create an array
@@ -33,8 +42,18 @@ class FlatState{
             current = current[key];
         }
         
+        // Handle negative index for the final key
+        let finalKey = path[path.length - 1];
+        if (Array.isArray(current) && typeof finalKey === 'number' && finalKey < 0) {
+            finalKey = current.length + finalKey;
+            // If the calculated index is still negative, throw an error
+            if (finalKey < 0) {
+                throw new Error(`Negative index ${path[path.length - 1]} is out of bounds for array of length ${current.length}`);
+            }
+        }
+        
         // Set the final value
-        current[path[path.length - 1]] = value;
+        current[finalKey] = value;
         if(this.setterCallback){
             let all_props = {path:path,value:value};
             if(props){
@@ -73,8 +92,32 @@ class FlatState{
     getState() {
         return this.mainObject;
     }
-
-
+    size(path){
+        const arr = this.get(path);
+        if(Array.isArray(arr)){
+            return arr.length;
+        }
+        return 0;
+    }
+    append(path, value, props) {
+        if (!Array.isArray(path) || path.length === 0) {
+            throw new Error('Path must be a non-empty array');
+        }
+        
+        let current  = this.get(path);
+        
+        if (current === undefined || current === null) {
+            // Create an array at the path if it doesn't exist
+            this.set(path, []);
+            current = this.get(path);
+        }
+        
+        if (!Array.isArray(current)) {
+            throw new Error('Target at path is not an array');
+        }
+        
+        current.push(value);
+    }
 
     createValueSetterHandler(path){
         return (newValue) => {
